@@ -1,3 +1,6 @@
+drop index "NICK"."WF_CTRY_CURR_IDX";
+drop index "NICK"."WF_CTRY_REG_IDX";
+
 --query number of languages by region
 select
     wfr.region_name,
@@ -34,6 +37,25 @@ group by
 order by
     wfr.region_name; 
     
+--query highest and lowest elevations in the Americas
+select
+    wfr.region_name,
+    min(wfc.lowest_elevation) as lowest_elevation,
+    max(wfc.highest_elevation) as highest_elevation
+from
+    wf_countries wfc
+    join wf_spoken_languages wsp
+        on wfc.country_id = wsp.country_id
+    join wf_languages wla
+        on wsp.language_id = wla.language_id
+    join wf_world_regions wfr
+        on wfc.region_id = wfr.region_id
+where
+    wfr.region_id in (select distinct region_id from wf_world_regions where region_name like '%America%')
+group by
+    wfr.region_name
+order by
+    wfr.region_name; 
     
 --query country name with lowest elevation by region
 select

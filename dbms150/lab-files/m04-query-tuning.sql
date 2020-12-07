@@ -44,10 +44,6 @@ select
     max(wfc.highest_elevation) as highest_elevation
 from
     wf_countries wfc
-    join wf_spoken_languages wsp
-        on wfc.country_id = wsp.country_id
-    join wf_languages wla
-        on wsp.language_id = wla.language_id
     join wf_world_regions wfr
         on wfc.region_id = wfr.region_id
 where
@@ -57,57 +53,44 @@ group by
 order by
     wfr.region_name; 
     
---query country name with lowest elevation by region
+--query region name with lowest elevation by region
 select
     iq.region_name,
-    iq.country_name,
     iq.lowest_elevation
 from
     (
     select
         wfr.region_name,
-        wfc.country_name,
         wfc.lowest_elevation,
-        row_number() over (partition by(wfc.lowest_elevation) order by wfc.lowest_elevation) as row_num
+        row_number() over(partition by wfr.region_name order by wfc.lowest_elevation) as row_num
     from
         wf_countries wfc
-        join wf_spoken_languages wsp
-            on wfc.country_id = wsp.country_id
-        join wf_languages wla
-            on wsp.language_id = wla.language_id
         join wf_world_regions wfr
             on wfc.region_id = wfr.region_id
+    --where wfc.country_name = 'Hashemite Kingdom of Jordan';
     ) iq
 where
     iq.row_num = 1
 order by
-    iq.region_name,
-    iq.country_name;    
+    iq.region_name;
     
-    
---query country name with highest elevation by region
+--query region name with highest elevation by region
 select
     iq.region_name,
-    iq.country_name,
     iq.highest_elevation
 from
     (
     select
         wfr.region_name,
-        wfc.country_name,
         wfc.highest_elevation,
-        row_number() over (partition by(wfc.highest_elevation) order by wfc.highest_elevation) as row_num
+        row_number() over(partition by wfr.region_name order by wfc.highest_elevation) as row_num
     from
         wf_countries wfc
-        join wf_spoken_languages wsp
-            on wfc.country_id = wsp.country_id
-        join wf_languages wla
-            on wsp.language_id = wla.language_id
         join wf_world_regions wfr
             on wfc.region_id = wfr.region_id
+    --where wfc.country_name = 'Hashemite Kingdom of Jordan';
     ) iq
 where
     iq.row_num = 1
 order by
-    iq.region_name,
-    iq.country_name;     
+    iq.region_name;  
